@@ -1,21 +1,41 @@
 N = 8
-row = [list()] * N #행
-col = [list()] * N #열
-inc = [list()] * (2*N-1) #오른쪽 위 대각선
-dec = [list()] * (2*N-1) #오른쪽 아래 대각선
+
+index = [[list()] * N, [list()] * N, [list()] * (2*N-1), [list()] * (2*N-1)]
+#0: 행
+#1: 열
+#2: 오른쪽 위 대각선
+#3: 오른쪽 아래 대각선
 
 #piece = {}
 value = {}
 
+def findex(cord):
+    ret = []
+    ret.append(index[0][cord[0]])
+    ret.append(index[1][cord[1]])
+    ret.append(index[2][cord[0] - cord[1] + N - 1])
+    ret.append(index[3][cord[0] + cord[1]])
+
+    return ret
+
 def locate(piece, cord):
     piece.cord = cord
-    row[cord[0]].append(piece)
-    col[cord[1]].append(piece)
-    inc[cord[0] - cord[1] + N - 1].append(piece)
-    dec[cord[0] + cord[1]].append(piece)
+    index[0][cord[0]].append(piece)
+    index[1][cord[1]].append(piece)
+    index[2][cord[0] - cord[1] + N - 1].append(piece)
+    index[3][cord[0] + cord[1]].append(piece)
 
 def inBoard(cord):
     return ( 0 <= cord[0] < N ) and ( 0 <= cord[1] < N )
+
+class Piece:
+    cord = list()
+    movble = list()
+
+    def __init__(self, cord):
+        self.cord = list()
+        self.movble = list()
+        locate(self, cord)
 
 class Pawn:
     cord = list()
@@ -26,9 +46,8 @@ class Pawn:
         locate(self, cord)
 
         #find movable locations
-        if inBoard([cord[0], cord[1] + 1]): self.movble.append([cord[0], cord[1] + 1])
-        if inBoard([cord[0] - 1, cord[1] + 1]): self.movble.append([cord[0] - 1, cord[1] + 1])
-        if inBoard([cord[0] + 1, cord[1] + 1]): self.movble.append([cord[0] + 1, cord[1] + 1])
+        for a in range(-1, 2):
+            if inBoard([cord[0] + a, cord[1] + 1]): self.movble.append([cord[0], cord[1] + 1])
 
 class Rook:
     cord = list()
@@ -72,3 +91,30 @@ class Bishop:
         locate(self, cord)
 
         # find movable locations
+
+class King:
+    cord = list()
+    movble = list()
+    def __init__(self, cord):
+        self.cord = list()
+        self.movble = list()
+        locate(self, cord)
+
+        #find movable locations
+        for a in range(-1, 2):
+            for b in range(-1, 2):
+                if not (a == 0 and b == 0):
+                    if inBoard([cord[0] + a, cord[1] + b]): self.movble.append([cord[0] + a, cord[1] + b])
+
+def main():
+    first = list(map(int, input().split()))
+    K = King(first)
+
+    for loc in K.movble:
+        flag = 0
+        for ind in findex(loc):
+            for p in ind:
+                if loc in p.movble:
+                    printf("")
+
+main()
