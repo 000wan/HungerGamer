@@ -135,21 +135,47 @@ def print_board():
         print()
 
 def main():
-    #first = list(map(int, input().split()))
 
-    B1 = Piece(decode('b3'), 'B', 1)
+    '''B1 = Piece(decode('b3'), 'B', 1)
     K1 = Piece(decode('h4'), 'K', 1)
     N1 = Piece(decode('f4'), 'N', 0)
-    R1 = Piece(decode('g4'), 'R', 0)
+    R1 = Piece(decode('g4'), 'R', 0)'''
+
+    K1 = Piece(decode('g1'), 'K', 0)
+    B1 = Piece(decode('f1'), 'B', 0)
+    B2 = Piece(decode('f4'), 'B', 0)
+    K2 = Piece(decode('b7'), 'K', 1)
+    R1 = Piece(decode('d8'), 'R', 1)
+    P1 = Piece(decode('d7'), 'P', 1)
 
     print_board()
 
-    hold(K1)
-    for loc in K1.movble:
-        for ind in findex(loc):
-            for p in ind:
-                if loc in p.movble:
-                    print("%s: %sx%s" % (encode(loc), p.type, encode(loc)))
+    print("움직일 수 있는 위치: ", end=' ')
+    for loc in K2.movble: print(encode(loc), end=' ')
+    print('\n')
 
+    hold(K2)
+    cnt = 0
+    die = 0
+    for loc in K2.movble:
+        flag = 0
+
+        for ind in findex(loc):
+            if inBoard([loc[0] + 2, 0]): ind += index[0][loc[0] + 2]
+            if inBoard([loc[0] - 2, 0]): ind += index[0][loc[0] - 2]
+            if inBoard([0, loc[1] + 2]): ind += index[1][loc[1] + 2]
+            if inBoard([0, loc[1] - 2]): ind += index[1][loc[1] - 2]
+
+            for p in ind:
+                if loc in p.movble and p.team != K2.team and not flag:
+                    print("%s: %sx%s" % (encode(loc), p.type, encode(loc)))
+                    die += 1
+                    flag = 1
+                    break
+        if not flag: print("%s: not die" % encode(loc))
+        cnt += 1
+
+    surv_rate = 100.0*(cnt-die)/cnt
+    print("킹이 생존할 확률: %.0f%%" % surv_rate)
 
 main()
